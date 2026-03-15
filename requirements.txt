@@ -1,0 +1,25 @@
+# ===========================================
+# PRODUCTION DEPENDENCIES
+# Para desarrollo, usar: pip install -r requirements-dev.txt
+# ===========================================
+
+# Flask core
+Flask==3.0.2
+Werkzeug==3.0.1
+
+# WSGI Server para producción
+gunicorn==21.2.0
+
+# Utilidades
+python-dotenv==1.0.1
+
+# Requests para llamadas API
+requests==2.31.0
+
+# Flask cache
+flask_caching==2.3.1
+
+# (Opcional) Para futuras expansiones
+# Flask-SQLAlchemy==3.1.1  # Base de datos
+# Flask-Login==0.6.3       # Autenticación
+# Flask-WTF==1.2.1         # Formularios

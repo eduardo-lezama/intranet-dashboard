@@ -1,0 +1,506 @@
+/* ==========================================================================
+   COMPONENTS - Cards, Buttons, Forms
+   ========================================================================== */
+
+/* ==================== CARDS ==================== */
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-base),
+              box-shadow var(--transition-base),
+              border-color var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.card--solid {
+  background: var(--color-bg-secondary);
+  backdrop-filter: none;
+}
+
+.card--elevated {
+  background: var(--color-bg-elevated);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.card__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.card__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+}
+
+.card__content {
+  color: var(--color-text-secondary);
+}
+
+.card__footer {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Card con gradiente de acento */
+.card--accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-accent-primary), var(--color-accent-secondary));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* ==================== BUTTONS ==================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: transform var(--transition-fast),
+              box-shadow var(--transition-fast),
+              background-color var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn--primary {
+  background-color: var(--color-accent-primary);
+  color: var(--color-bg-primary);
+}
+
+.btn--primary:hover,
+.btn--primary:focus-visible {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn--secondary {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.btn--secondary:hover,
+.btn--secondary:focus-visible {
+  background-color: var(--color-text-muted);
+}
+
+.btn--ghost {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--glass-border);
+}
+
+.btn--ghost:hover,
+.btn--ghost:focus-visible {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+}
+
+.btn--icon {
+  padding: var(--space-sm);
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ==================== BADGES ==================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.25rem 0.75rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge--success {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge--warning {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge--error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge--info {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: var(--color-info);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* ==================== METRIC CARDS ==================== */
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.metric__value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.metric__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric__change {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.metric__change--positive {
+  color: var(--color-success);
+}
+
+.metric__change--negative {
+  color: var(--color-error);
+}
+
+/* ==================== ICONOS ==================== */
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.icon--sm { width: 1rem; height: 1rem; }
+.icon--lg { width: 2rem; height: 2rem; }
+.icon--xl { width: 3rem; height: 3rem; }
+
+/* ==================== UTILITIES ==================== */
+.text-muted { color: var(--color-text-muted); }
+.text-primary { color: var(--color-accent-primary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ==================== LAYOUT UTILITIES ==================== */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: var(--space-xl);
+}
+
+.page-title {
+  margin-bottom: var(--space-sm);
+}
+
+.section-spacer {
+  margin-bottom: var(--space-2xl);
+}
+
+.card-spacer {
+  margin-bottom: var(--space-lg);
+}
+
+/* ==================== WEATHER SKELETON ==================== */
+.weather-skeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.weather-skeleton__icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.weather-skeleton__content {
+  flex: 1;
+}
+
+.weather-skeleton__title {
+  height: 40px;
+  margin-bottom: var(--space-sm);
+}
+
+.weather-skeleton__subtitle {
+  height: 20px;
+}
+
+/* ==================== SKELETON VARIANTS ==================== */
+.skeleton--lg {
+  height: 60px;
+}
+
+/* ==================== FINANZAS SPECIFIC ==================== */
+.balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* ==================== DOCUMENTS ==================== */
+.docs-toggle {
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+.docs-loading {
+  font-size: 1rem;
+  color: var(--docs-loading-color);
+}
+
+/* ==================== ERROR PAGES ==================== */
+.error-page {
+  max-width: 600px;
+  margin: 5rem auto;
+  text-align: center;
+}
+
+.error-page__content {
+  padding: var(--space-2xl);
+}
+
+.error-page__emoji {
+  font-size: 5rem;
+  margin-bottom: var(--space-lg);
+}
+
+.error-page__title {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--space-md);
+}
+
+/* ==================== JAVASCRIPT RENDER CLASSES ==================== */
+
+/* Weather Widget */
+.weather-widget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.weather-current {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.weather-current__icon {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.weather-current__info {
+  flex: 1;
+}
+
+.weather-current__temp {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.weather-current__desc {
+  color: var(--color-text-secondary);
+  margin-top: var(--space-xs);
+  text-transform: capitalize;
+}
+
+.weather-current__details {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+}
+
+.weather-forecast {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.weather-forecast__day {
+  text-align: center;
+  padding: 6px 4px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+}
+
+.weather-forecast__weekday {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.weather-forecast__temp {
+  font-size: 1.3rem;
+  margin: 2px 0;
+}
+
+.weather-forecast__icon {
+  font-size: 1.1rem;
+}
+
+/* Weather States */
+.weather-state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  border-left: 3px solid;
+}
+
+.weather-state--warning {
+  border-color: var(--color-warning);
+}
+
+.weather-state--error {
+  border-color: var(--color-error);
+}
+
+.weather-state__icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.weather-state__content {
+  flex: 1;
+}
+
+.weather-state__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.weather-state__message {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.weather-state__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+  color: var(--color-accent-primary);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+}
+
+/* ==================== ENERGY COMPONENT ==================== */
+
+.energy-status {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.energy-status__header {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-xs);
+  color: var(--color-text-secondary);
+}
+
+.energy-status__content {
+  font-size: var(--font-size-sm);
+}
+
+/* Energy metrics con unidades */
+.energy-status .metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.metric__unit {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}

@@ -1,0 +1,86 @@
+services:
+  npm:
+    # Nginx Proxy Manager - Reverse Proxy con UI
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Madrid
+    ports:
+      - "80:80"
+      - "81:81"
+      - "4443:443"
+    volumes:
+      - /share/Container/nginx-proxy-manager/data:/data
+      - /share/Container/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+    networks:
+      - intranet_net
+      - ha_net
+
+  # Tu App Flask Intranet
+  intranet:
+    build: /share/Container/intranet
+    container_name: intranet
+    restart: unless-stopped
+    # Gunicorn optimizado: 1 worker con 4 threads (menos RAM, suficiente para dashboard doméstico)
+    command: gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 4 --worker-class gthread --timeout 60 app:app
+    expose:
+      - "5000" # No exponemos puerto al host, solo a la red docker
+    environment:
+      ENV_TARGET: nas
+      FLASK_ENV: production
+      FLASK_DEBUG: "False"
+    env_file:
+      - /share/Container/intranet/.env
+    networks:
+      - intranet_net
+      - ha_net
+    volumes:
+      - /share/Container/intranet:/app
+      - /share/Container/intranet/data:/data
+      - /share/Container/intranet/cache:/app/cache  # Cache persistente
+      - /share/Musgous_Together/Documents_Llar:/mnt/Documentos:ro  # Montar Documentos como solo lectura
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Resource limits optimizados para 1 worker
+    deploy:
+      resources:
+        limits:
+          memory: 384M   # Reducido de 512M (1 worker necesita menos)
+          cpus: '0.5'
+        reservations:
+          memory: 192M   # Reducido de 256M
+          cpus: '0.25'
+      
+
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest   # recomendado (oficial)
+    container_name: mealie
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Madrid
+      - ALLOWED_HOSTS=0.0.0.0,::,mealie.local
+      # BASE_URL es útil si vas a usar un dominio/proxy; ajusta al que uses
+      - BASE_URL=http://mealie.local
+      - ALLOW_SIGNUP=false
+    volumes:
+      - /share/Container/mealie/data:/app/data
+    expose:
+      - "9000"
+    networks:
+      - intranet_net
+
+networks:
+  intranet_net:
+    driver: bridge
+    name: intranet_net
+  ha_net:
+    external: true
+    name: home-automation_ha_net

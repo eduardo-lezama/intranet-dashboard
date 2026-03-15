@@ -1,0 +1,89 @@
+# Entorno virtual
+venv/
+env/
+.venv/
+
+# Variables de entorno (NUNCA subir - contienen tokens y passwords)
+.env
+.env.*
+!.env.example
+
+# Scripts locales personalizados (si tienes versiones con rutas específicas)
+# start.bat y start.sh genéricos se suben al repo
+
+# Cache de aplicación (volumen persistente en producción)
+cache/
+data/
+
+# Desarrollo local
+requirements-dev.txt
+#Al haber movido todo el MCE a la carpeta padre, dejo esto como ejemplo para github.
+#.windsurf.bak 
+
+# Ruff
+.ruff_cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Flask
+instance/
+.webassets-cache
+
+# Cache
+.cache/
+*.cache
+
+# Temporal files
+*.tmp
+*.temp

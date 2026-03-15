@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Finanzas - Intranet Casa{% endblock %}
+
+{% block content %}
+
+<div class="page-container">
+
+  <!-- Header de página -->
+  <div class="page-header">
+    <h1 class="page-title">Gestión Financiera</h1>
+    <p class="text-muted">Control de gastos compartidos con Settle Up</p>
+  </div>
+
+  <!-- Resumen superior -->
+  <div class="bento-grid section-spacer">
+
+    <!-- Situación general -->
+    <div class="card span-4">
+      <div class="metric">
+        <span class="metric__label">Situación del grupo</span>
+        <span class="metric__value" id="finMainStatus">Cargando...</span>
+        <span class="metric__change text-muted">
+          Basado en el balance actual de Settle Up
+        </span>
+      </div>
+    </div>
+
+    <!-- Gastos del mes -->
+    <div class="card span-4">
+      <div class="metric">
+        <span class="metric__label">Gastos del mes</span>
+        <span class="metric__value" id="finGastosMes">€ 0.00</span>
+        <span class="metric__change text-muted">
+          Total acumulado del mes
+        </span>
+      </div>
+    </div>
+
+    <!-- Enlace directo a Settle Up -->
+    <div class="card span-4">
+      <div class="metric">
+        <span class="metric__label">Ver en Settle Up</span>
+        <span class="metric__value">
+          <a href="https://settleup.app/" target="_blank" class="btn btn--secondary">
+            Abrir Settle Up
+            <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </a>
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bloque principal: resumen de grupo -->
+  <div class="card card--accent section-spacer">
+    <div class="card__header">
+      <h2 class="card__title">Resumen del grupo (Settle Up)</h2>
+    </div>
+    <div class="card__content">
+      <p id="finResumen" class="text-muted card-spacer">
+        Cargando datos del grupo...
+      </p>
+
+      <!-- Balance por persona -->
+      <div class="card card-spacer">
+        <div class="card__header">
+          <h3 class="card__title">Balance por persona</h3>
+        </div>
+        <div class="card__content">
+          <div id="finBalancesLista">
+            <!-- Se rellena vía JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Últimas transacciones (placeholder, requiere endpoint adicional si quieres detallarlas) -->
+      <div class="card">
+        <div class="card__header">
+          <h3 class="card__title">Últimas transacciones</h3>
+        </div>
+        <div class="card__content">
+          <div id="finTransaccionesLista" class="text-muted">
+            Próximamente: listado de últimos gastos desde Settle Up.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+async function loadFinanzasDetalle() {
+  try {
+    const r = await fetch('/api/settleup');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+
+    // Resumen principal (situación)
+    const resumenEl = document.getElementById('finResumen');
+    const statusDashboardEl = document.getElementById('finMainStatus');
+    const gastosMesEl = document.getElementById('finGastosMes');
+
+    if (resumenEl && data.status) {
+      resumenEl.textContent = data.status;
+    }
+    if (statusDashboardEl && data.status) {
+      statusDashboardEl.textContent = data.status;
+    }
+    if (gastosMesEl) {
+      gastosMesEl.textContent = `€ ${data.monthly_expenses.toFixed(2)}`;
+    }
+
+    // Balance por persona
+    const contBalances = document.getElementById('finBalancesLista');
+    if (contBalances && data.balances) {
+      contBalances.innerHTML = Object.entries(data.balances).map(([name, bal]) => {
+        const sign = bal >= 0 ? '+' : '-';
+        const cls  = bal >= 0 ? 'text-positive' : 'text-negative';
+        return `
+          <div class="balance-row">
+            <span>${name}</span>
+            <span class="${cls}">${sign}€ ${Math.abs(bal).toFixed(2)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Nota: finTransaccionesLista queda como placeholder hasta que expongamos /entries
+  } catch (e) {
+    console.error('❌ Error cargando finanzas:', e);
+    const resumenEl = document.getElementById('finResumen');
+    if (resumenEl) resumenEl.textContent = 'Error cargando datos de Settle Up.';
+    const statusDashboardEl = document.getElementById('finMainStatus');
+    if (statusDashboardEl) statusDashboardEl.textContent = 'Error al cargar';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadFinanzasDetalle);
+</script>
+
+{% endblock %}
