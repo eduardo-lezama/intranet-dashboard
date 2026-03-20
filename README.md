@@ -24,7 +24,7 @@ Os presento mi miniproyecto personal de INTRANET DASHBOARD codificado personalme
 - 💰 **Finanzas compartidas** (Settle Up)
 - 📚 **Documentos NAS** (acceso a archivos)
 - 🔐 **DNSCrypt-proxy** - healthcheck de servidor DNS encriptado
-- 🍽️ **Menu Processor** - procesador de menús semanales y listas de compra
+- 🍽️ **Menu Processor** - procesador de menús con estado dinámico (activo/desactivado) y botón deshabilitado cuando el servicio está apagado
 
 ## 🛠️ Stack Tecnológico
 
@@ -476,7 +476,7 @@ Todos los endpoints devuelven JSON y se pueden probar directamente en el navegad
 | `/api/weather` | OpenWeather | 15 min | Clima actual y pronóstico |
 | `/api/settleup` | Settle Up | 5 min | Balance de gastos compartidos |
 | `/api/devices` | Home Assistant | 1 min | Estado de dispositivos IoT |
-| `/api/menu-processor` | Menu Processor | 1 min | Healthcheck del servicio |
+| `/api/menu-processor` | Menu Processor | 5 s | Healthcheck rápido del servicio (`up/down`) |
 | `/api/dnscrypt` | DNSCrypt | 1 min | Healthcheck via DNS query |
 
 **Ejemplo de uso:**
@@ -489,6 +489,15 @@ http://localhost:5000/api/pihole
 ```
 
 Si algo falla, el endpoint devuelve `{"error": "mensaje"}` con código HTTP 500/503.
+
+### 🍽️ Estado manual de Menu Processor
+
+El contenedor `menu-processor` se puede encender/apagar manualmente desde Container Station/Qmanager y el dashboard adapta la UX automáticamente:
+
+- Si `/api/menu-processor` responde `status=up`: badge `Activo` y botón habilitado.
+- Si `/api/menu-processor` responde `status=down` o error: badge `Desactivado` y botón en gris, no clicable.
+
+Esta lógica está preparada en frontend para extenderse fácilmente a otras cards de servicios.
 
 ### Logs
 

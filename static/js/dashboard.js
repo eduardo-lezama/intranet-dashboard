@@ -1,6 +1,15 @@
 class Dashboard {
   constructor() {
     this.intervals = new Set(); // Track all intervals for cleanup
+    this.serviceCardConfigs = {
+      menuProcessor: {
+        badgeId: 'menuProcessorBadge',
+        badgeTextId: 'menuProcessorBadgeText',
+        buttonId: 'menuProcessorButton',
+        activeLabel: 'Activo',
+        inactiveLabel: 'Desactivado'
+      }
+    };
     this.init();
   }
 
@@ -419,7 +428,7 @@ async loadDashboardStatus() {
       { name: 'Mealie', endpoint: '/api/mealie' },
       { name: 'Energy', endpoint: '/api/energy' },
       { name: 'SettleUp', endpoint: '/api/settleup' },
-      { name: 'Menu Processor', endpoint: '/api/menu-processor' },
+      { key: 'menuProcessor', name: 'Menu Processor', endpoint: '/api/menu-processor' },
       { name: 'DNSCrypt', endpoint: '/api/dnscrypt' }
     ];
     
@@ -432,6 +441,7 @@ async loadDashboardStatus() {
       const check = checks[index];
       const isOk = check.status === 'fulfilled' && !check.value?.error;
       return {
+        key: service.key,
         name: service.name,
         status: isOk ? 'ok' : 'error',
         error: !isOk ? (check.reason?.message || check.value?.error || 'Error') : null
@@ -453,6 +463,7 @@ async loadDashboardStatus() {
     
     // Renderizar popup con detalle de cada servicio
     this.renderServicesPopup(serviceResults);
+    this.syncServiceCardsFromResults(serviceResults);
       
     // 3. QNAP status (simulado)
     const qnapEl = document.getElementById('qnapStatus');
@@ -478,6 +489,63 @@ renderServicesPopup(services) {
       </span>
     </li>
   `).join('');
+}
+
+syncServiceCardsFromResults(serviceResults) {
+  const statusByKey = new Map(
+    serviceResults
+      .filter(service => service.key)
+      .map(service => [service.key, service])
+  );
+
+  Object.entries(this.serviceCardConfigs).forEach(([serviceKey, config]) => {
+    const serviceState = statusByKey.get(serviceKey);
+    const isActive = serviceState ? serviceState.status === 'ok' : false;
+    this.updateServiceCardState(config, isActive);
+  });
+}
+
+updateServiceCardState(config, isActive) {
+  const badge = document.getElementById(config.badgeId);
+  const badgeText = document.getElementById(config.badgeTextId);
+  const button = document.getElementById(config.buttonId);
+
+  if (badge) {
+    badge.classList.remove('badge--success', 'badge--inactive');
+    badge.classList.add(isActive ? 'badge--success' : 'badge--inactive');
+  }
+
+  if (badgeText) {
+    badgeText.textContent = isActive ? config.activeLabel : config.inactiveLabel;
+  }
+
+  this.setServiceActionState(button, isActive);
+}
+
+setServiceActionState(button, isActive) {
+  if (!button) return;
+
+  const originalHref = button.dataset.originalHref || button.getAttribute('href') || '';
+
+  if (isActive) {
+    if (originalHref) {
+      button.setAttribute('href', originalHref);
+    }
+    button.classList.remove('btn--disabled');
+    button.removeAttribute('aria-disabled');
+    button.removeAttribute('tabindex');
+    button.removeAttribute('title');
+    return;
+  }
+
+  if (originalHref) {
+    button.dataset.originalHref = originalHref;
+  }
+  button.removeAttribute('href');
+  button.classList.add('btn--disabled');
+  button.setAttribute('aria-disabled', 'true');
+  button.setAttribute('tabindex', '-1');
+  button.setAttribute('title', 'Servicio desactivado manualmente en NAS');
 }
 
 // Setup del popup de servicios (toggle para mobile)

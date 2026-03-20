@@ -194,11 +194,11 @@
     <div class="card service-card span-3 min-h-300 animate-fade-in animate-delay-2">
         <div class="card__header">
             <h3 class="card__title">🍽️ Menús Semanales</h3>
-            <span class="badge badge--success">
+            <span class="badge badge--success" id="menuProcessorBadge">
                 <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
-                Activo
+                <span id="menuProcessorBadgeText">Activo</span>
             </span>
         </div>
 
@@ -235,7 +235,7 @@
         </div>
 
         <div class="card__footer">
-            <a href="{{ services.menu_processor.url }}" target="_blank" class="btn btn--primary">
+            <a href="{{ services.menu_processor.url }}" target="_blank" class="btn btn--primary" id="menuProcessorButton" data-original-href="{{ services.menu_processor.url }}">
                 Abrir Procesador de Menús
                 <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>

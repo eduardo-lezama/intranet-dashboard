@@ -573,7 +573,7 @@ def serve_document(categoria, filename):
 
 
 @main_bp.route("/api/menu-processor")
-@cache.cached(timeout=60)
+@cache.cached(timeout=5)
 def api_menu_processor():
     """
     Health check del servicio Menu Processor
@@ -587,11 +587,20 @@ def api_menu_processor():
     try:
         response = requests.get(f"{menu_url}/api/health", timeout=5)
         if response.ok:
-            return jsonify({"status": "ok", "service": "menu-processor"})
-        return jsonify({"error": f"HTTP {response.status_code}"}), 500
+            return jsonify({"status": "up", "service": "menu-processor"})
+        return (
+            jsonify(
+                {
+                    "status": "down",
+                    "service": "menu-processor",
+                    "error": f"HTTP {response.status_code}",
+                }
+            ),
+            503,
+        )
     except requests.RequestException as e:
         current_app.logger.error(f"Menu Processor health check failed: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status": "down", "service": "menu-processor", "error": str(e)}), 503
 
 
 @main_bp.route("/api/dnscrypt")

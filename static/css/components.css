@@ -147,6 +147,16 @@
   pointer-events: none;
 }
 
+.btn--disabled {
+  background-color: rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
 /* ==================== BADGES ==================== */
 .badge {
   display: inline-flex;
@@ -176,6 +186,12 @@
   background-color: rgba(239, 68, 68, 0.15);
   color: var(--color-error);
   border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge--inactive {
+  background-color: rgba(148, 163, 184, 0.15);
+  color: var(--color-text-muted);
+  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .badge--info {
