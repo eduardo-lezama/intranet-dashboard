@@ -442,7 +442,7 @@ class Dashboard {
       const statusEl = document.getElementById('finMainStatus');
       const gastosEl = document.getElementById('finGastosMes');
       if (statusEl && data.status) statusEl.textContent = data.status;
-      if (gastosEl) gastosEl.textContent = `€ ${data.monthly_expenses?.toFixed(2) || '0.00'}`;
+      if (gastosEl) gastosEl.textContent = data.monthly_expenses?.toFixed(2) || '0.00';
     } catch (error) {
       const statusEl = document.getElementById('finMainStatus');
       if (statusEl) statusEl.textContent = 'Error al cargar';

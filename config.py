@@ -47,7 +47,7 @@ class Config:
     TESTING = False
 
     # Usuarios (simplificado para demo)
-    USERS = {"default": {"name": "Usuario", "partner": "Pareja"}}
+    USERS = {"default": {"name": "stranger", "partner": "traveller"}}
 
     # URLs de servicios (para enlaces en UI, no para llamadas servidor-a-servidor)
     # Nota: Estos enlaces son para el navegador del usuario, no para Docker networking
@@ -155,6 +155,12 @@ class Config:
                 "entity_id": "sensor.endoll_ups_nas_router_power",
                 "name": "NAS + UPS + Router",
                 "icon": "⚡",
+                "unit": "W",
+            },
+            {
+                "entity_id": "sensor.endoll_workstation_edu_power",
+                "name": "Workstation Edu",
+                "icon": "🖥️",
                 "unit": "W",
             },
         ],

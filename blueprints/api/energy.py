@@ -25,7 +25,8 @@ def api_energy():
         if not ha_url:
             return jsonify({"error": "HOMEASSISTANT_URL no configurado"}), 500
 
-        energy_client = EnergyClient(ha_url, ha_token)
+        timeout = current_app.config.get("API_TIMEOUT", 15)
+        energy_client = EnergyClient(ha_url, ha_token, timeout=timeout)
         data = energy_client.get_energy_summary()
         return jsonify(data)
 

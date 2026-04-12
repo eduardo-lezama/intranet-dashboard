@@ -239,12 +239,12 @@
 }
 
 .metric__value {
-  font-family: var(--font-display);
+  font-family: var(--font-numeric);
   font-size: var(--text-3xl);
-  font-weight: var(--weight-black);
+  font-weight: 700;
   color: var(--color-text-primary);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -260,11 +260,11 @@
 
 .metric__unit {
   font-family: var(--font-body);
-  font-size: 0.45em;
-  font-weight: var(--weight-medium);
-  color: var(--color-text-muted);
+  font-size: 0.6em;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 }
 
 .metric__label {

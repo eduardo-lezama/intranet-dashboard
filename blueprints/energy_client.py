@@ -7,7 +7,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 import requests
-from flask import current_app
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +14,10 @@ logger = logging.getLogger(__name__)
 class EnergyClient:
     """Cliente para obtener datos de consumo eléctrico de Home Assistant"""
 
-    def __init__(self, base_url, api_token=None):
+    def __init__(self, base_url, api_token=None, timeout=15):
         self.base_url = base_url.rstrip("/")
         self.api_token = api_token
+        self.timeout = timeout  # Resolved outside threads — current_app not available inside ThreadPoolExecutor
         self.headers = (
             {"Authorization": f"Bearer {self.api_token}", "Content-Type": "application/json"}
             if self.api_token
@@ -49,7 +49,7 @@ class EnergyClient:
             url = f"{self.base_url}/api/states/{entity_id}"
 
             response = requests.get(
-                url, headers=self.headers, timeout=current_app.config.get("API_TIMEOUT", 15)
+                url, headers=self.headers, timeout=self.timeout
             )
             response.raise_for_status()
 
@@ -79,7 +79,7 @@ class EnergyClient:
             url = f"{self.base_url}/api/states/{entity_id}"
 
             response = requests.get(
-                url, headers=self.headers, timeout=current_app.config.get("API_TIMEOUT", 15)
+                url, headers=self.headers, timeout=self.timeout
             )
             response.raise_for_status()
 
@@ -108,7 +108,7 @@ class EnergyClient:
             url = f"{self.base_url}/api/states/{entity_id}"
 
             response = requests.get(
-                url, headers=self.headers, timeout=current_app.config.get("API_TIMEOUT", 15)
+                url, headers=self.headers, timeout=self.timeout
             )
             response.raise_for_status()
 
