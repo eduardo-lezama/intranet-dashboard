@@ -5,543 +5,254 @@
 | **Menu Processor** |
 | <p align="center"><img src="assets/menu_processor.png" width="50%"></p> |
 
-# 🏠 Intranet Casa - Dashboard Familiar
+# Intranet Casa - Dashboard v2.0
 
-Os presento mi miniproyecto personal de INTRANET DASHBOARD codificado personalmente y usando técnologia "agentic" con **MCP, reglas, flujo y memoria.** Mi intención es tener mi propio cuadro de mando para gestión del hogar con integración de servicios en contenedores docker 😀
+Personal intranet dashboard for home management, deployed on a QNAP TS-264 NAS. Built as a Flask monolith with multiple service integrations, a "Bento 2.0" frontend design, and optimized for low-resource Docker containers.
 
-## 🎯 Características
+## Features
 
-- ✨ Dashboard moderno con Bento Grid layout
-- 🌓 Dark theme elegante y responsive
-- 📱 Diseño mobile-first
-- ⚡ **Consumo eléctrico en tiempo real** (Home Assistant)
-- 🏠 **Dispositivos IoT** - sensores y enchufes desde Home Assistant
-- 📊 **Estado de servicios** - popup con detalle de cada servicio (hover/click)
-- 🛡️ **Pi-hole** con estadísticas de bloqueo
-- 🍳 **Mealie** para gestión de recetas
-- 🌤️ **Clima** con OpenWeatherMap
-- 📝 **Lista de la compra** compartida
-- 💰 **Finanzas compartidas** (Settle Up)
-- 📚 **Documentos NAS** (acceso a archivos)
-- 🔐 **DNSCrypt-proxy** - healthcheck de servidor DNS encriptado
-- 🍽️ **Menu Processor** - procesador de menús con estado dinámico (activo/desactivado) y botón deshabilitado cuando el servicio está apagado
+- **Bento 2.0 Grid** - Hierarchical card layout with micro-interactions and staggered CSS animations
+- **Dark theme** - "Warm Observatory" aesthetic (forest green + amber accents)
+- **Pi-hole** - DNS ad-blocking statistics
+- **Mealie** - Recipe management and daily meal plans
+- **Home Assistant** - Energy consumption (kWh, cost, real-time power) and IoT device states
+- **OpenWeatherMap** - Current weather and 5-day forecast (server-side proxy)
+- **Settle Up** - Shared finances with group balance
+- **Shopping list** - Shared list with SQLite persistence
+- **Documents** - NAS-mounted file browser
+- **DNSCrypt-proxy** - Encrypted DNS health check
+- **Menu Processor** - Weekly menu processing with dynamic service state
 
-## 🛠️ Stack Tecnológico
+## Architecture
 
-- **Backend**: Flask + Gunicorn
-- **Frontend**: HTML5, CSS3 (Variables CSS), JavaScript Vanilla
-- **Containerización**: Docker + Docker Compose
-- **Reverse Proxy**: Nginx Proxy Manager
-- **NAS**: QNAP TS-264 con Container Station
-- **Integraciones**: Home Assistant, Pi-hole, Mealie, OpenWeatherMap
-
-## 🧩 Model‑Context Engineering (MCE)
-
-Este proyecto aplica Model Context Protocol junto con una estructura de reglas, flujos y memoria persistente para mantener coherencia técnica, calidad en el código y un estilo de desarrollo reproducible.
-El objetivo no es “usar IA”, sino integrarla como parte del proceso de ingeniería, de forma controlada y predecible.
-
-### 📁 Estructura `.windsurf/`
-
-> **Nota**: La carpeta `.windsurf.bak/` contiene un backup de las skills, workflows y rules originales de este proyecto. Estas configuraciones fueron consolidadas en el monorepo padre. Lo mantengo aquí como ejemplo de integración MCE para quienes quieran ver cómo estructuro las reglas para desarrollo asistido por IA.
-
-```
-.windsurf/
-├── rules/              # Reglas de contexto por área
-│   ├── backend.md      # Patrones Flask, clientes API, cache
-│   ├── frontend.md     # JavaScript, CSS BEM, accesibilidad
-│   ├── orchestrator.md # Flujo de trabajo general
-│   └── testing.md      # Pytest, fixtures, mocks
-├── skills/             # Tareas reutilizables
-│   ├── añadir-servicio/    # Integrar nuevo servicio externo
-│   ├── crear-cliente/      # Cliente API con requests.Session
-│   ├── crear-endpoint/     # Nuevo endpoint en blueprints
-│   ├── crear-widget/       # Widget frontend completo
-│   └── commit/             # Conventional Commits
-├── workflows/          # Automatizaciones
-│   ├── validar.md      # Lint + format + tests
-│   └── fix-lint.md     # Auto-fix con ruff
-└── memories/           # Contexto persistente
-    ├── general.md      # Stack y convenciones
-    └── git.md          # Conventional Commits
-```
-
-### 🛠️ Skills Disponibles
-
-| Skill | Descripción |
-|-------|-------------|
-| `@añadir-servicio` | Integrar servicio externo completo (config + cliente + endpoint + widget) |
-| `@crear-cliente` | Cliente API con `requests.Session`, retry y error handling |
-| `@crear-endpoint` | Endpoint Flask con cache y logging |
-| `@crear-widget` | Widget frontend con fetch async y estados de carga |
-| `@commit` | Mensaje siguiendo Conventional Commits |
-
-### 📋 Workflows
-
-| Comando | Acción |
-|---------|--------|
-| `/validar` | Ejecuta ruff lint + format + pytest |
-| `/fix-lint` | Auto-corrige errores de lint |
-
-### 🧠 Tecnologías AI
-
-- **MCP (Model Context Protocol)**: Integración con herramientas externas
-- **Context7**: Documentación actualizada de librerías
-- **Sequential Thinking**: Resolución de problemas complejos
-- **Memory System**: Persistencia de contexto entre sesiones
-
-
-## 📦 Instalación
-
-### 📋 Requisitos
-- Python 3.11+ instalado
-- Git
-
-### 1. Clonar/Crear estructura
-
-```bash
-mkdir intranet && cd intranet
-# Copiar todos los archivos según la estructura
-```
-
-### 2. Entorno Virtual
-
-```bash
-python -m venv venv
-venv\Scripts\activate  # Windows
-# o
-source venv/bin/activate  # Linux/Mac
-```
-
-### 3. Dependencias
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configuración
-
-Copia `.env.example` a `.env` y configura tus variables:
-
-```bash
-cp .env.example .env
-# Edita .env con tus claves API y configuraciones
-```
-
-Usa **el mismo nombre de archivo (`.env`) en todos los entornos**:
-- Local: `.env` con URLs de dominio interno (`ha.local`, `mealie.local`)
-- NAS: `.env` con URLs service-to-service (`http://homeassistant:8123`, `http://mealie:9000`)
-
-Variables importantes:
-```bash
-# Perfil de ejecución
-ENV_TARGET=local          # local | nas
-FLASK_ENV=development     # development | production
-
-# API Keys
-OPENWEATHER_API_KEY=tu_api_key
-
-# URLs de servicios por entorno
-MEALIE_BASE_URL_LOCAL=http://mealie.local
-MEALIE_BASE_URL_NAS=http://mealie:9000
-PIHOLE_URL=http://YOUR_PIHOLE_IP/admin
-HOMEASSISTANT_URL_LOCAL=http://ha.local
-HOMEASSISTANT_URL_NAS=http://homeassistant:8123
-
-# Tokens
-HOMEASSISTANT_TOKEN=tu_long_lived_token
-SETTLEUP_API_KEY=tu_api_key
-```
-
-### 5. Ejecutar
-
-#### Opción A: Script automático (recomendado)
-```bash
-# Windows
-start.bat
-
-# Linux/Mac  
-./start.sh
-```
-
-#### Opción B: Manual
-```bash
-# Con venv activado
-python app.py
-```
-
-### 🌐 Acceso
-- **Dashboard**: http://localhost:5000
-- **APIs**: http://localhost:5000/api/*
-
-### 🏗️ Estructura del Proyecto
 ```
 intranet/
-├── app.py              # App Flask principal
-├── config.py           # Configuración
-├── blueprints/         # Rutas y APIs
-│   ├── main.py         # Endpoints principales
-│   └── energy_client.py # Cliente Home Assistant
-├── static/            # CSS, JS, imágenes
-│   ├── css/           # Estilos
-│   └── js/            # JavaScript
-├── templates/         # Plantillas HTML
-├── requirements.txt   # Dependencias Python
-├── .env              # Variables de entorno (NO subir a git)
-├── .env.example      # Plantilla de variables
-├── start.bat         # Script inicio Windows
-├── start.sh          # Script inicio Linux/Mac
-└── venv/             # Entorno virtual (NO subir a git)
+├── app.py                    # Flask factory (create_app)
+├── config.py                 # Configuration with env_target() for local/NAS
+├── cache.py                  # Flask-Caching (FileSystemCache)
+├── blueprints/
+│   ├── __init__.py           # Central blueprint registration
+│   ├── dashboard.py          # Page rendering (/, /finanzas)
+│   ├── api/
+│   │   ├── weather.py        # /api/weather (server-side proxy)
+│   │   ├── pihole.py         # /api/pihole
+│   │   ├── mealie.py         # /api/mealie
+│   │   ├── energy.py         # /api/energy, /api/devices
+│   │   ├── settleup.py       # /api/settleup
+│   │   ├── shopping.py       # /api/shopping (SQLite CRUD)
+│   │   ├── documents.py      # /api/docs/*, /docs/*
+│   │   └── services.py       # /api/status, /api/health, /api/menu-processor, /api/dnscrypt
+│   ├── energy_client.py      # Home Assistant energy client (parallel requests)
+│   ├── mealie_client.py      # Mealie API client
+│   ├── pihole_auth.py        # Pi-hole v6 authentication
+│   └── settleup_client.py    # SettleUp/Firebase client (cached auth token)
+├── static/
+│   ├── css/                  # Design system: variables, base, components, dashboard
+│   └── js/                   # main.js (utils) + dashboard.js (widget controller)
+├── templates/                # Jinja2 templates
+├── Dockerfile                # Alpine-based, non-root user, healthcheck
+└── docker-compose.yml        # Full stack: NPM + Intranet + Mealie
 ```
 
-## ⚡ Integración con Home Assistant (Consumo Eléctrico)
+## Tech Stack
 
-### 📋 Requisitos
-- Home Assistant instalado y accesible
-- Token de acceso largo de Home Assistant
-- Sensores de energía configurados
+| Layer | Technology |
+|-------|-----------|
+| Backend | Flask 3.0 + Gunicorn (1 worker, 4 gthreads) |
+| Frontend | Vanilla JS + CSS custom properties (no build step) |
+| Caching | Flask-Caching with FileSystemCache |
+| Database | SQLite (shopping list) |
+| Container | Docker Alpine, non-root, resource-limited |
+| Proxy | Nginx Proxy Manager |
+| Fonts | Syne (display) + Outfit (body) via Google Fonts |
 
-### 🔧 Configuración
+## Quick Start (Local Development)
 
-#### 1. Obtener Token de Home Assistant
-1. Ve a Home Assistant → Perfil de usuario
-2. Desplázate hasta "Tokens de acceso largo"
-3. Crea nuevo token con nombre "Intranet Dashboard"
-4. Copia el token generado
-
-#### 2. Configurar Variables
-Añade a tu archivo `.env`:
 ```bash
-ENV_TARGET=local
-HOMEASSISTANT_URL_LOCAL=http://ha.local
-HOMEASSISTANT_URL_NAS=http://homeassistant:8123
-HOMEASSISTANT_TOKEN=tu_long_lived_access_token
+# 1. Clone and setup
+cd intranet
+python -m venv venv
+source venv/bin/activate    # Linux/Mac
+venv\Scripts\activate       # Windows
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Configure environment
+cp .env.example .env
+# Edit .env with your API keys and service URLs
+
+# 4. Run
+python app.py
+# Dashboard at http://localhost:5000
 ```
 
-#### 3. Sensores Requeridos
-La integración espera estos sensores en Home Assistant:
+## Configuration
 
-**Consumo Mensual**
-- Entity ID: `sensor.endoll_ups_nas_router_energy_month`
-- Tipo: Sensor numérico (kWh)
+All secrets are loaded from environment variables. Copy `.env.example` to `.env` and fill in:
 
-**Coste Energía**
-- Entity ID: `sensor.endoll_ups_nas_router_energy_cost`
-- Tipo: Sensor numérico (€/kWh o € total)
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ENV_TARGET` | Yes | `local` or `nas` (resolves service URLs) |
+| `OPENWEATHER_API_KEY` | No | OpenWeatherMap free API key |
+| `PIHOLE_URL` | No | Pi-hole admin URL |
+| `PIHOLE_PASSWORD` | No | Pi-hole v6 password |
+| `HOMEASSISTANT_URL_*` | No | HA URL (local and NAS variants) |
+| `HOMEASSISTANT_TOKEN` | No | HA long-lived access token |
+| `MEALIE_BASE_URL_*` | No | Mealie URL (local and NAS variants) |
+| `MEALIE_API_KEY` | No | Mealie API token |
+| `SETTLEUP_*` | No | SettleUp credentials and Firebase API key |
+| `DNSCRYPT_IP` | No | DNSCrypt-proxy server IP |
 
-**Potencia Actual**
-- Entity ID: `sensor.endoll_ups_nas_router_power`
-- Tipo: Sensor numérico (W)
+The `env_target()` helper in `config.py` resolves URLs based on `ENV_TARGET`:
+- `local` -> uses `*_LOCAL` variant (browser-accessible URLs)
+- `nas` -> uses `*_NAS` variant (Docker service-to-service URLs)
 
-### 📊 Métricas Mostradas
+## API Endpoints
 
-- **Consumo del mes**: Total kWh acumulado
-- **Coste del mes**: Total € calculado (automático si es €/kWh)
-- **Potencia actual**: Consumo instantáneo en W
+| Endpoint | Service | Cache | Method |
+|----------|---------|-------|--------|
+| `/api/weather` | OpenWeatherMap | 10 min | GET |
+| `/api/pihole` | Pi-hole v6 | 5 min | GET |
+| `/api/mealie` | Mealie | 5 min | GET |
+| `/api/energy` | Home Assistant | 5 min | GET |
+| `/api/devices` | Home Assistant | 1 min | GET |
+| `/api/settleup` | SettleUp/Firebase | 15 min | GET |
+| `/api/shopping` | SQLite | - | GET/POST/DELETE |
+| `/api/docs/structure` | NAS filesystem | - | GET |
+| `/api/menu-processor` | Menu Processor | 5 s | GET |
+| `/api/dnscrypt` | DNSCrypt-proxy | 1 min | GET |
+| `/api/health` | Internal | - | GET |
+| `/api/status` | Internal | - | GET |
 
-### 🎨 Formato de Visualización
+## Adding a New Service Integration
 
-- **Unidades integradas**: `5.82kWh` | `0.41€` | `41.97W`
-- **Estilo consistente**: Valores grandes y en negrita
-- **Iconos descriptivos**: ⚡ para energía
+The codebase follows a consistent pattern for each service:
 
-### ⚡ Cache y Performance
+### 1. Create the API client (if needed)
 
-- **Cache**: 5 minutos (optimizado para producción)
-- **Refresh**: Cada 10 minutos en frontend
-- **Logs**: Debug detallado para troubleshooting
+```python
+# blueprints/myservice_client.py
+class MyServiceClient:
+    def __init__(self, base_url, api_token):
+        self.base_url = base_url.rstrip("/")
+        self.headers = {"Authorization": f"Bearer {api_token}"}
 
-### 🔍 Troubleshooting
-
-#### Datos no actualizan inmediatamente
-- **Cache de 5 minutos** por defecto
-- Espera 5 minutos o reduce cache para desarrollo
-
-#### Variables .env no cargan en Windsurf
-- Crea `.vscode/settings.json`:
-```json
-{
-    "python.terminal.useEnvFile": true
-}
+    def get_data(self):
+        response = requests.get(f"{self.base_url}/api/endpoint",
+                                headers=self.headers, timeout=15)
+        response.raise_for_status()
+        return response.json()
 ```
 
-#### Documentos 404 en desarrollo
-- Normal: busca ruta NAS `/mnt/Documentos`
-- Funcionará en producción
+### 2. Create the blueprint
 
-## 🛡️ Integración Pi-hole
+```python
+# blueprints/api/myservice.py
+from flask import Blueprint, current_app, jsonify
+from cache import cache
 
-### Configuración
-```bash
-PIHOLE_IP=YOUR_PIHOLE_IP
-PIHOLE_URL=http://YOUR_PIHOLE_IP/admin
-PIHOLE_PASSWORD=tu_password_hash
+myservice_bp = Blueprint("api_myservice", __name__)
+
+@myservice_bp.route("/api/myservice")
+@cache.cached(timeout=300)
+def api_myservice():
+    # ... fetch and return data
+    return jsonify(data)
 ```
 
-### Métricas
-- **Anuncios bloqueados hoy**
-- **Porcentaje de bloqueo**
-- **Queries DNS totales**
+### 3. Register the blueprint
 
-## 🍳 Integración Mealie
-
-### Configuración
-```bash
-MEALIE_BASE_URL_LOCAL=http://mealie.local
-MEALIE_BASE_URL_NAS=http://mealie:9000
-MEALIE_API_KEY=tu_api_key
+```python
+# blueprints/__init__.py — add to register_blueprints()
+from blueprints.api.myservice import myservice_bp
+app.register_blueprint(myservice_bp)
 ```
 
-### Funcionalidades
-- **Total de recetas**
-- **Comidas planificadas hoy**
-- **Acceso directo a Mealie**
+### 4. Add configuration
 
-## 🌤️ Integración Clima
-
-### Configuración
-```bash
-OPENWEATHER_API_KEY=tu_api_key
-WEATHER_CITY=Barcelona
-WEATHER_COUNTRY=ES
+```python
+# config.py — add to Config class
+MYSERVICE_URL = env_target("MYSERVICE_URL", "http://localhost:8080", "http://myservice:8080")
+MYSERVICE_TOKEN = env_str("MYSERVICE_TOKEN", "")
 ```
 
-### Datos mostrados
-- **Temperatura actual**
-- **Descripción del clima**
-- **Pronóstico 5 días**
+### 5. Add the frontend widget
 
-## 🏠 Dispositivos IoT (Home Assistant)
+Add the card HTML to `templates/dashboard.html` and the data-loading method to `static/js/dashboard.js` following the existing pattern.
 
-### Descripción
-Widget que muestra el estado de dispositivos IoT conectados a Home Assistant:
-- **Sensores de potencia**: consumo en W, kWh
-- **Sensores binarios**: puertas, detectores de gas, movimiento
-- **Enchufes inteligentes**: estado on/off con consumo
+### 6. Add IoT devices
 
-### Configuración
-Los dispositivos se configuran en `config.py` → `HA_DEVICES`:
+To add Home Assistant devices, edit `HA_DEVICES` in `config.py`:
 
 ```python
 HA_DEVICES = {
     "power": [
-        {
-            "entity_id": "sensor.enchufe_power",
-            "name": "NAS + Router",
-            "icon": "⚡",
-            "unit": "W",
-        },
+        {"entity_id": "sensor.xxx", "name": "My Sensor", "icon": "...", "unit": "W"},
     ],
     "sensors": [
-        {
-            "entity_id": "binary_sensor.detector_gas",
-            "name": "Detector Gas",
-            "icon": "🔥",
-            "type": "binary",
-            "state_on": "¡Detectado!",
-            "state_off": "OK",
-        },
+        {"entity_id": "binary_sensor.xxx", "name": "My Door", "icon": "...",
+         "type": "binary", "state_on": "Open", "state_off": "Closed"},
     ],
 }
 ```
 
-### Añadir nuevo dispositivo
-1. Buscar `entity_id` en HA → Configuración → Entidades
-2. Añadir a la categoría correspondiente en `config.py`
-3. Reiniciar la aplicación
+## Docker Deployment
 
-### Endpoint
-- **URL**: `/api/devices`
-- **Cache**: 1 minuto
-- **Respuesta**: Lista de dispositivos con estado actual
+### Container Resources
 
-## 💰 Integración Finanzas (Settle Up)
+Optimized for constrained NAS hardware:
 
-### Configuración
+| Resource | Limit | Reservation |
+|----------|-------|-------------|
+| Memory | 384 MB | 192 MB |
+| CPU | 0.5 cores | 0.25 cores |
+
+Gunicorn runs with **1 worker + 4 gthreads** — enough for a household dashboard while keeping memory under 100 MB typical.
+
+### Build and Run
+
 ```bash
-SETTLEUP_EMAIL=tu_email@gmail.com
-SETTLEUP_PASSWORD=tu_password
-SETTLEUP_GROUP_ID=tu_group_id
-SETTLEUP_API_KEY=tu_api_key
-```
-
-### Métricas
-- **Estado del grupo**
-- **Gastos del mes**
-
-## 🐳 Docker (Producción)
-
-### Optimizado para QNAP TS-264 (8GB RAM)
-
-```yaml
-services:
-  intranet:
-    build: .
-    command: gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 4 --worker-class gthread --timeout 45 app:app
-    environment:
-      - ENV_TARGET=nas
-      - FLASK_ENV=production
-    volumes:
-      - ./cache:/app/cache  # Cache persistente
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 384M
-        reservations:
-          cpus: '0.25'
-          memory: 192M
-```
-
-### Ejecutar
-```bash
-cd /share/Container/intranet
-mkdir -p cache
 docker compose up -d --build intranet
 ```
 
-## 🔧 Configuración Avanzada
+### Persistent Volumes
 
-### Cache
-- **Tiempo**: 5 minutos por defecto
-- **Propósito**: Reducir load en servicios externos
-- **Ajuste**: Modificar `@cache.cached(timeout=300)`
+The application requires persistent storage for:
 
-### Logs
-- **Nivel**: INFO por defecto, DEBUG para desarrollo
-- **Ubicación**: Consola y logs de Flask
-- **Especial**: Home Assistant muestra DEBUG detallados
+| Volume | Container path | Purpose |
+|--------|---------------|---------|
+| App code | `/app` | Application source |
+| Cache | `/app/cache` | Flask-Caching FileSystemCache (survives restarts) |
+| Data | `/data` | SQLite database (`shopping.db`) |
+| Documents | `/mnt/Documentos` | NAS documents (read-only mount) |
 
-### Seguridad
-- **Tokens**: Almacenados en variables de entorno
-- **Permisos**: Solo lectura de sensores
-- **Comunicación**: HTTPS cuando está disponible
+### Health Check
 
-## 🚀 Despliegue
-
-### Desarrollo Local
 ```bash
-python app.py
+curl http://localhost:5000/api/health
+# {"status": "healthy", "timestamp": "...", "version": "2.0.0"}
 ```
 
-### Producción (NAS) - Flujo rsync + Docker
+## Performance Notes
 
-#### Requisitos previos (solo una vez)
-1. **Configurar SSH keys** para acceso sin password al NAS
-2. **Crear alias SSH** en `~/.ssh/config`:
-```
-Host nas
-    HostName 192.168.1.X
-    User admin
-```
-3. **Crear carpeta en NAS**:
+- **Parallel HTTP requests**: Energy, weather, and device endpoints use `ThreadPoolExecutor` to run independent API calls concurrently
+- **Firebase token caching**: SettleUp client caches the Firebase auth token (1-hour TTL) instead of re-authenticating on each request
+- **SQLite for shopping**: Thread-safe, transactional storage replacing the original CSV approach
+- **FileSystemCache**: Disk-backed cache that persists across container restarts, reducing API load
+- **`@starting-style` CSS animations**: Zero-JS entrance animations using native CSS (no requestAnimationFrame or IntersectionObserver overhead)
+- **`prefers-reduced-motion`**: Respects user accessibility settings
+
+## Development Tools
+
 ```bash
-ssh nas "mkdir -p /share/Container/intranet"
+# Lint and format
+ruff check . --fix
+ruff format .
+
+# Type of linting rules: see pyproject.toml [tool.ruff]
 ```
 
-#### Despliegue (cada vez que hagas cambios)
+## License
 
-**Desde WSL (recomendado):**
-```bash
-# Sincronizar archivos al NAS
-./deploy.sh intranet
-
-# Reconstruir contenedor en NAS
-ssh nas "cd /share/Container/intranet && docker compose up -d --build"
-```
-
-El script `deploy.sh` usa rsync con exclusiones (venv, cache, .git, etc.) para sincronización incremental rápida.
-
-### Reverse Proxy (Nginx Proxy Manager)
-```nginx
-location / {
-    proxy_pass http://intranet:5000;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-}
-```
-
-## 📈 Monitorización y Debug
-
-### Endpoints API disponibles
-
-Todos los endpoints devuelven JSON y se pueden probar directamente en el navegador o con `curl`:
-
-| Endpoint | Servicio | Cache | Descripción |
-|----------|----------|-------|-------------|
-| `/api/energy` | Home Assistant | 5 min | Consumo eléctrico (kWh, €, W) |
-| `/api/pihole` | Pi-hole | 5 min | Estadísticas DNS (ads bloqueados) |
-| `/api/mealie` | Mealie | 5 min | Recetas y menú semanal |
-| `/api/shopping` | Mealie | 3 min | Lista de compra activa |
-| `/api/weather` | OpenWeather | 15 min | Clima actual y pronóstico |
-| `/api/settleup` | Settle Up | 5 min | Balance de gastos compartidos |
-| `/api/devices` | Home Assistant | 1 min | Estado de dispositivos IoT |
-| `/api/menu-processor` | Menu Processor | 5 s | Healthcheck rápido del servicio (`up/down`) |
-| `/api/dnscrypt` | DNSCrypt | 1 min | Healthcheck via DNS query |
-
-**Ejemplo de uso:**
-```bash
-# Desde terminal
-curl http://localhost:5000/api/energy
-
-# O directamente en navegador
-http://localhost:5000/api/pihole
-```
-
-Si algo falla, el endpoint devuelve `{"error": "mensaje"}` con código HTTP 500/503.
-
-### 🍽️ Estado manual de Menu Processor
-
-El contenedor `menu-processor` se puede encender/apagar manualmente desde Container Station/Qmanager y el dashboard adapta la UX automáticamente:
-
-- Si `/api/menu-processor` responde `status=up`: badge `Activo` y botón habilitado.
-- Si `/api/menu-processor` responde `status=down` o error: badge `Desactivado` y botón en gris, no clicable.
-
-Esta lógica está preparada en frontend para extenderse fácilmente a otras cards de servicios.
-
-### Logs
-
-Los logs van a la consola de Flask/Gunicorn. En Docker:
-```bash
-docker logs intranet
-docker logs -f intranet  # seguir en tiempo real
-```
-
-## 🐛 Troubleshooting Común
-
-### Problemas frecuentes
-1. **Variables .env no cargan**: Configura Windsurf o reinicia
-2. **Cache con errores viejos**: Espera 5 minutos o limpia cache
-3. **Documentos 404**: Normal en desarrollo, funcionará en NAS
-4. **Tokens expirados**: Genera nuevo token en Home Assistant
-
-### Debug mode
-```bash
-FLASK_DEBUG=1 python app.py
-```
-
-## 🤝 Contribuciones
-
-1. Fork del proyecto
-2. Feature branch
-3. Pull request
-
-## 📄 Licencia
-
-MIT License - libre uso personal y comercial
-
----
-
-## 🎯 Roadmap
-
-### ✅ Completado
-- [x] **Dispositivos IoT** - sensores y enchufes desde Home Assistant
-- [x] **Popup estado servicios** - detalle de cada servicio con hover/click
-- [x] **Optimización Docker** - Alpine, 1 worker, cache persistente
-- [x] **DNSCrypt-proxy** - healthcheck de servidor DNS encriptado
-- [x] **Menu Processor** - integración con procesador de menús semanales
-
-### 🔜 Pendiente
-- [ ] **Monitorización del NAS** (espacio, temperatura)
-- [ ] **Alertas personalizadas** (umbral de consumo)
-- [ ] **Gráficos históricos** (consumo energético)
+MIT License

@@ -1,6 +1,12 @@
-# app/services/mealie_client.py
+"""
+Cliente para la API de Mealie - Recetas y planificación de comidas
+"""
+
+import logging
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 class MealieClient:
@@ -44,7 +50,7 @@ class MealieClient:
             resp.raise_for_status()
         except requests.RequestException as e:
             # Si falla, devolver lista vacía en vez de romper
-            print(f"Error fetching today meals: {e}")
+            logger.error(f"Error fetching today meals: {e}")
             return []
 
         data = resp.json()

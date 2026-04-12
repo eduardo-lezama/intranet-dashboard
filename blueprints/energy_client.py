@@ -2,15 +2,14 @@
 Cliente para consumir datos de consumo eléctrico desde Home Assistant
 """
 
-import os
+import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 import requests
-from dotenv import load_dotenv
 from flask import current_app
 
-# Forzar recarga de variables al importar
-load_dotenv(override=True)
+logger = logging.getLogger(__name__)
 
 
 class EnergyClient:
@@ -18,7 +17,7 @@ class EnergyClient:
 
     def __init__(self, base_url, api_token=None):
         self.base_url = base_url.rstrip("/")
-        self.api_token = api_token or os.environ.get("HOMEASSISTANT_TOKEN")
+        self.api_token = api_token
         self.headers = (
             {"Authorization": f"Bearer {self.api_token}", "Content-Type": "application/json"}
             if self.api_token
@@ -65,7 +64,7 @@ class EnergyClient:
             }
 
         except Exception as e:
-            print(f"Error obteniendo consumo mensual: {e}")
+            logger.error(f"Error obteniendo consumo mensual: {e}")
             return {"consumption_kwh": None, "period": "mes actual", "error": str(e)}
 
     def get_monthly_cost(self):
@@ -87,11 +86,6 @@ class EnergyClient:
             data = response.json()
             cost = self._to_float_state(data.get("state"), entity_id)
 
-            # Debug: print valores
-            print(
-                f"DEBUG: Coste mensual de HA: {cost}, unit: {data['attributes'].get('unit_of_measurement', 'N/A')}"
-            )
-
             # El sensor ya es el coste mensual correcto, sin necesidad de cálculos adicionales
             return {
                 "cost_eur": round(cost, 2),
@@ -101,7 +95,7 @@ class EnergyClient:
             }
 
         except Exception as e:
-            print(f"Error obteniendo coste mensual: {e}")
+            logger.error(f"Error obteniendo coste mensual: {e}")
             return {"cost_eur": None, "period": "mes actual", "error": str(e)}
 
     def get_current_power(self):
@@ -121,11 +115,6 @@ class EnergyClient:
             data = response.json()
             power = self._to_float_state(data.get("state"), entity_id)
 
-            # Debug: print valores
-            print(
-                f"DEBUG: Potencia: {power}, unit: {data['attributes'].get('unit_of_measurement', 'N/A')}"
-            )
-
             return {
                 "power_w": round(power, 2),
                 "last_updated": data.get("last_updated", datetime.now().isoformat()),
@@ -133,21 +122,29 @@ class EnergyClient:
             }
 
         except Exception as e:
-            print(f"Error obteniendo potencia actual: {e}")
+            logger.error(f"Error obteniendo potencia actual: {e}")
             return {"power_w": None, "error": str(e)}
 
     def get_energy_summary(self):
         """
-        Obtiene resumen completo de energía
+        Obtiene resumen completo de energía.
+        Ejecuta las 3 llamadas a HA en paralelo para reducir latencia.
         """
-        consumption = self.get_monthly_consumption()
-        cost = self.get_monthly_cost()
-        power = self.get_current_power()
+        results = {}
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            futures = {
+                executor.submit(self.get_monthly_consumption): "consumption",
+                executor.submit(self.get_monthly_cost): "cost",
+                executor.submit(self.get_current_power): "current_power",
+            }
+            for future in as_completed(futures):
+                key = futures[future]
+                try:
+                    results[key] = future.result()
+                except Exception as e:
+                    logger.error(f"Error en {key}: {e}")
+                    results[key] = {"error": str(e)}
 
-        return {
-            "consumption": consumption,
-            "cost": cost,
-            "current_power": power,
-            "dashboard_url": f"{self.base_url}/energy/electricity",
-            "last_updated": datetime.now().isoformat(),
-        }
+        results["dashboard_url"] = f"{self.base_url}/energy/electricity"
+        results["last_updated"] = datetime.now().isoformat()
+        return results

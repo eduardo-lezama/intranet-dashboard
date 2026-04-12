@@ -1,7 +1,12 @@
+import threading
 from datetime import UTC, datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 import requests
+
+# Module-level token cache for SettleUp Firebase auth
+_token_cache = {"token": None, "expires_at": None, "key": None}
+_token_lock = threading.Lock()
 
 """
 Funciones estaticas auxiliares para tema de timezone, errores de deriva y gmt+1
@@ -50,28 +55,51 @@ class SettleUpClient:
         self.group_id = group_id
 
         # Endpoints oficiales documentados
+        if not api_key:
+            raise ValueError(
+                "SETTLEUP_API_KEY es obligatorio. "
+                "Configúralo en .env (sandbox o live key según entorno)."
+            )
+        self.api_key = api_key
+
         if env == "sandbox":
             self.base_url = "https://settle-up-sandbox.firebaseio.com"
-            self.api_key = "REDACTED_FIREBASE_KEY"
         else:
             self.base_url = "https://settle-up-live.firebaseio.com"
-            if not api_key:
-                raise Exception("Para usar live, debes pasar SETTLEUP_API_KEY")
-            self.api_key = api_key
 
         self.id_token = self._authenticate(email, password)
 
     def _authenticate(self, email, password):
         """
-        Autenticación Firebase REST API oficial
+        Autenticación Firebase REST API oficial con token caching.
+        Firebase tokens duran 1 hora; re-usamos el token si no ha expirado.
         https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
         """
+        cache_key = f"{email}:{self.env}"
+
+        with _token_lock:
+            if (
+                _token_cache["token"]
+                and _token_cache["key"] == cache_key
+                and _token_cache["expires_at"]
+                and datetime.now(UTC) < _token_cache["expires_at"]
+            ):
+                return _token_cache["token"]
+
         url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={self.api_key}"
         payload = {"email": email, "password": password, "returnSecureToken": True}
         response = requests.post(url, json=payload)
 
         if response.ok:
-            return response.json()["idToken"]
+            data = response.json()
+            token = data["idToken"]
+            # Firebase tokens expire in 3600s; use 3000s margin for safety
+            expires_in = int(data.get("expiresIn", 3600))
+            with _token_lock:
+                _token_cache["token"] = token
+                _token_cache["key"] = cache_key
+                _token_cache["expires_at"] = datetime.now(UTC) + timedelta(seconds=expires_in - 600)
+            return token
         else:
             error = response.json().get("error", {})
             raise Exception(f"Auth failed: {error.get('message', 'Unknown error')}")

@@ -15,6 +15,21 @@ env/
 cache/
 data/
 
+# Bases de datos SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# Documentación interna con detalles de infraestructura
+INTERNAL_README.md
+
+# Claves y certificados
+*.key
+*.pem
+*.crt
+*.p12
+secrets/
+
 # Desarrollo local
 requirements-dev.txt
 #Al haber movido todo el MCE a la carpeta padre, dejo esto como ejemplo para github.

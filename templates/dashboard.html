@@ -4,90 +4,66 @@
 
 {% block content %}
 
-<!-- Dashboard Header -->
 <h1 class="visually-hidden">Dashboard Intranet Casa</h1>
 
-<!-- BENTO GRID LAYOUT -->
+<!-- BENTO 2.0 GRID -->
 <div class="bento-grid">
-    
-    <!-- 1) WELCOME CARD -->
-    <div class="card welcome-card span-4 row-span-1 min-h-200 animate-fade-in">
+
+    <!-- ═══ ROW 1: HERO ═══ -->
+    <div class="card welcome-card span-12">
         <div class="welcome-card__header">
-        <div class="welcome-card__greeting">
-            <span class="welcome-card__line">Hello <span id="userName">stranger</span>!</span><br>
-            <span class="welcome-card__line">Abandon all hope, ye who enter here! 🔥</span>
-        </div>
+            <div class="welcome-card__greeting">
+                Hello <span id="userName">{{ user_name }}</span>!<br>
+                <span style="font-size: var(--text-sm); color: var(--color-text-muted); font-weight: var(--weight-normal);">
+                    Abandon all hope, ye who enter here.
+                </span>
+            </div>
         </div>
 
-        <!-- Hora + fecha centradas -->
         <div class="welcome-card__time-block">
             <div id="currentTime" class="welcome-card__time"></div>
             <div id="currentDate" class="welcome-card__date"></div>
         </div>
 
-        <!-- Estado rápido en pills -->
         <div class="welcome-card__status-pills">
-            <div class="status-pill status-pill--wifi">
+            <div class="status-pill">
                 <span class="status-pill__label">
-                <span class="status-pill__icon">📶</span>
-                <span class="status-pill__text">WiFi</span>
+                    <span class="status-pill__icon">📶</span>
+                    <span class="status-pill__text">WiFi</span>
                 </span>
-                <span class="status-pill__value" id="wifiStatus">-- dispositivos</span>
+                <span class="status-pill__value" id="wifiStatus">--</span>
             </div>
 
-            <div class="status-pill status-pill--qnap">
+            <div class="status-pill">
                 <span class="status-pill__label">
-                <span class="status-pill__icon">💻</span>
-                <span class="status-pill__text">QNAP</span>
+                    <span class="status-pill__icon">💻</span>
+                    <span class="status-pill__text">QNAP</span>
                 </span>
                 <span class="status-pill__value status-pill__value--ok" id="qnapStatus">Online</span>
             </div>
 
             <div class="status-pill status-pill--services" id="servicesPill" tabindex="0" role="button" aria-expanded="false" aria-haspopup="true">
                 <span class="status-pill__label">
-                <span class="status-pill__icon">📊</span>
-                <span class="status-pill__text">Servicios</span>
+                    <span class="status-pill__icon">📊</span>
+                    <span class="status-pill__text">Servicios</span>
                 </span>
-                <span class="status-pill__value status-pill__value--ok" id="servicesStatus">-/8 ...</span>
-                <!-- Popup de detalle de servicios -->
+                <span class="status-pill__value status-pill__value--ok" id="servicesStatus">-/8</span>
                 <div class="services-popup" id="servicesPopup" role="tooltip">
                     <div class="services-popup__header">Estado de Servicios</div>
-                    <ul class="services-popup__list" id="servicesPopupList">
-                        <!-- JS renderiza aquí -->
-                    </ul>
+                    <ul class="services-popup__list" id="servicesPopupList"></ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 2) LISTA DE LA COMPRA -->
-    <div class="card span-4 min-h-300 animate-fade-in animate-delay-4">
-        <div class="card__header">
-            <h3 class="card__title">🛒 Lista Compra</h3>
-            <button class="btn btn--icon btn--ghost" id="addShoppingBtn" title="Añadir producto" aria-label="Añadir producto a la lista de compra">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-            </button>
-        </div>
-        <div class="card__content">
-            <ul id="shoppingList" class="shopping-list">
-                <!-- Items cargados dinámicamente -->
-            </ul>
-        </div>
-    </div>
+    <!-- ═══ ROW 2: Weather + Energy + IoT ═══ -->
 
-    <!-- 3) WEATHER WIDGET -->
-    <div class="card span-4 min-h-200 animate-fade-in animate-delay-1">
+    <!-- WEATHER -->
+    <div class="card span-5">
         <div class="card__header">
-            <h3 class="card__title">Clima - {{ config.WEATHER_CITY }}</h3>
+            <h3 class="card__title">Clima</h3>
         </div>
-        <div id="weatherWidget" 
-             class="card__content"
-             data-api-key="{{ config.OPENWEATHER_API_KEY }}"
-             data-city="{{ config.WEATHER_CITY }}"
-             data-country="{{ config.WEATHER_COUNTRY }}">
-            <!-- JavaScript cargará el clima aquí -->
+        <div id="weatherWidget" class="card__content">
             <div class="weather-skeleton">
                 <div class="skeleton weather-skeleton__icon"></div>
                 <div class="weather-skeleton__content">
@@ -98,265 +74,215 @@
         </div>
     </div>
 
-    <!-- 4) PI-HOLE CARD -->
-    <div class="card service-card span-3 min-h-300 animate-fade-in animate-delay-2">
+    <!-- ENERGY -->
+    <div class="card span-4">
         <div class="card__header">
-            <h3 class="card__title">🛡️ Pi-hole</h3>
-            <span class="badge badge--success">
-                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-                Protegido
-            </span>
-        </div>
-        <div class="service-card__icon-wrapper">
-            <svg class="service-card__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-        </div>
-        <div class="service-card__content">
-            <p class="service-card__description">
-                Bloqueo de anuncios y seguimiento en toda la red doméstica
-            </p>
-            <div id="piholeStats" class="stats-grid">
-                <!-- JavaScript cargará estadísticas aquí -->
-                <div class="skeleton skeleton--lg"></div>
-                <div class="skeleton skeleton--lg"></div>
-            </div>
-        </div>
-        <div class="card__footer">
-            <a href="{{ services.pihole.url }}" target="_blank" class="btn btn--primary">
-                Abrir Pi-hole
-                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                </svg>
-            </a>
-        </div>
-    </div>
-
-    <!-- 5) MEALIE CARD - Recetas y plan de hoy -->
-    <div class="card service-card span-3 min-h-300 animate-fade-in animate-delay-1">
-        <div class="card__header">
-            <h3 class="card__title">🍳 Recetas</h3>
-            <span class="badge badge--success">
-            <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            Activo
-            </span>
-        </div>
-
-        <div class="service-card__icon-wrapper">
-            <svg class="service-card__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-            </svg>
-        </div>
-
-        <div class="service-card__content">
-            <p class="service-card__description">
-            Gestiona tus recetas favoritas y planifica comidas de la semana
-            </p>
-
-            <div id="mealieStats" class="stats-grid">
-            <div class="metric">
-                <span class="metric__value" id="mealieRecipesCount">--</span>
-                <span class="metric__label">Recetas</span>
-            </div>
-            <div class="metric">
-                <span class="metric__value" id="mealieMealsTodayCount">--</span>
-                <span class="metric__label">Comidas hoy</span>
-            </div>
-            </div>
-
-            <div class="mealie-meals-today">
-            <div class="mealie-meals-header">
-                Plan de hoy
-            </div>
-            <div class="mealie-meals-list" id="mealieMealsList">
-                <div class="text-muted" style="font-size: var(--font-size-sm);">
-                Sin datos aún...
-                </div>
-            </div>
-            </div>
-        </div>
-
-        <div class="card__footer">
-            <a href="{{ services.mealie.url }}" target="_blank" class="btn btn--primary">
-            Abrir Mealie
-            <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-            </svg>
-            </a>
-        </div>
-    </div>
-
-    <!-- 6) MENU PROCESSOR CARD -->
-    <div class="card service-card span-3 min-h-300 animate-fade-in animate-delay-2">
-        <div class="card__header">
-            <h3 class="card__title">🍽️ Menús Semanales</h3>
-            <span class="badge badge--success" id="menuProcessorBadge">
-                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                </svg>
-                <span id="menuProcessorBadgeText">Activo</span>
-            </span>
-        </div>
-
-        <div class="service-card__icon-wrapper">
-            <svg class="service-card__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-            </svg>
-        </div>
-
-        <div class="service-card__content">
-            <p class="service-card__description">
-                Procesa menús semanales y genera listas de compra automáticas en Mealie
-            </p>
-
-            <!-- Flujo de trabajo visual - Grid 2x2 -->
-            <div class="menu-processor-flow">
-                <div class="flow-step">
-                    <i class="bi bi-upload flow-step__icon"></i>
-                    <span class="flow-step__label">Cargar menú</span>
-                </div>
-                <div class="flow-step">
-                    <i class="bi bi-filetype-json flow-step__icon"></i>
-                    <span class="flow-step__label">Leer JSON</span>
-                </div>
-                <div class="flow-step">
-                    <i class="bi bi-list-check flow-step__icon"></i>
-                    <span class="flow-step__label">Generar lista</span>
-                </div>
-                <div class="flow-step">
-                    <i class="bi bi-cart-plus flow-step__icon"></i>
-                    <span class="flow-step__label">Enviar a Mealie</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="card__footer">
-            <a href="{{ services.menu_processor.url }}" target="_blank" class="btn btn--primary" id="menuProcessorButton" data-original-href="{{ services.menu_processor.url }}">
-                Abrir Procesador de Menús
-                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                </svg>
-            </a>
-        </div>
-    </div>
-
-    <!-- 7) CONSUMO ELÉCTRICO -->
-    <div class="card span-4 min-h-300 animate-fade-in animate-delay-4">
-        <div class="card__header">
-            <h3 class="card__title">⚡ Consumo Eléctrico</h3>
-            <span class="badge badge--warning">
-                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-                Este mes
-            </span>
+            <h3 class="card__title">Consumo Eléctrico</h3>
+            <span class="badge badge--warning">Este mes</span>
         </div>
         <div class="card__content">
-            <div id="energyStats" class="stats-grid">
-                <div class="metric">
+            <div id="energyStats" class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="metric metric--center">
                     <div class="metric__value-unit">
                         <span class="metric__value" id="energyConsumption">--</span>
                         <span class="metric__unit">kWh</span>
                     </div>
                     <span class="metric__label">Consumo</span>
                 </div>
-                <div class="metric">
+                <div class="metric metric--center">
                     <div class="metric__value-unit">
                         <span class="metric__value" id="energyCost">--</span>
                         <span class="metric__unit">€</span>
                     </div>
                     <span class="metric__label">Coste</span>
                 </div>
-                <div class="metric">
+                <div class="metric metric--center">
                     <div class="metric__value-unit">
                         <span class="metric__value" id="energyPower">--</span>
                         <span class="metric__unit">W</span>
                     </div>
-                    <span class="metric__label">Potencia Actual</span>
+                    <span class="metric__label">Ahora</span>
                 </div>
             </div>
         </div>
-
         <div class="card__footer">
-            <a href="{{ services.homeassistant.url }}/energy/electricity" target="_blank" class="btn btn--primary">
-                Abrir Home Assistant
-                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                </svg>
+            <a href="{{ services.homeassistant.url }}/energy/electricity" target="_blank" class="btn btn--primary btn--sm">
+                Home Assistant
+                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
         </div>
     </div>
 
-    <!-- 7) DISPOSITIVOS IoT -->
-    <div class="card span-3 min-h-200 animate-fade-in animate-delay-3">
+    <!-- IoT DEVICES -->
+    <div class="card span-3">
         <div class="card__header">
-            <h3 class="card__title">🏠 Dispositivos IoT</h3>
-            <span class="badge badge--info" id="devicesCount">
-                <span id="devicesTotalCount">-</span> dispositivos
+            <h3 class="card__title">IoT</h3>
+            <span class="badge badge--info">
+                <span id="devicesTotalCount">-</span> disp.
             </span>
         </div>
         <div class="card__content">
             <ul class="devices-list" id="devicesList">
-                <li class="devices-list__item devices-list__item--loading">
-                    <span class="skeleton skeleton--sm"></span>
-                </li>
+                <li class="devices-list__item"><span class="skeleton skeleton--sm"></span></li>
             </ul>
         </div>
     </div>
 
-    <!-- 8) FINANZAS COMPARTIDAS -->
-    <div class="card span-4 min-h-300 animate-fade-in animate-delay-3">
+    <!-- ═══ ROW 3: Pi-hole + Finances + Shopping ═══ -->
+
+    <!-- PI-HOLE -->
+    <div class="card service-card span-3">
         <div class="card__header">
-            <h3 class="card__title">💰 Finanzas Compartidas</h3>
-            <span class="badge badge--info" id="finanzasPeriodo">
-            Este mes
+            <h3 class="card__title">Pi-hole</h3>
+            <span class="badge badge--success">
+                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                Activo
             </span>
         </div>
         <div class="card__content">
-            <div class="stats-grid">
-            <div class="metric finance-balance">
-                <span class="metric__label">Situación</span>
-                <span class="metric__value" id="finMainStatus">Cargando...</span>
-            </div>
-            <div class="metric finance-expenses">
-                <span class="metric__label">Gastos del mes</span>
-                <span class="metric__value" id="finGastosMes">€ 0.00</span>
-            </div>
+            <div id="piholeStats" class="stats-grid" style="grid-template-columns: 1fr;">
+                <div class="skeleton skeleton--lg"></div>
             </div>
         </div>
         <div class="card__footer">
-            <a href="{{ url_for('main.finanzas') }}" class="btn btn--primary">
-            Ver detalles
-            <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
+            <a href="{{ services.pihole.url }}" target="_blank" class="btn btn--primary btn--sm">
+                Abrir Pi-hole
+                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
         </div>
     </div>
-    
-    <!-- 8) DOCUMENTOS RAPIDOS -->
-    <div class="card span-4 min-h-300 animate-fade-in animate-delay-4" id="documentsCard">
+
+    <!-- FINANCES -->
+    <div class="card span-5">
         <div class="card__header">
-            <h3 class="card__title">
-                🗂️ Documentos
-            </h3>
-            <!-- Botón toggle (opcional, adaptado al estilo card) -->
-            <button class="btn btn--icon btn--sm docs-toggle" onclick="dashboardInstance.toggleAllFolders()" aria-expanded="false" aria-label="Alternar vista de documentos">
-                 <i class="bi bi-chevron-down"></i> <!-- Icono Bootstrap -->
+            <h3 class="card__title">Finanzas</h3>
+            <span class="badge badge--info">Este mes</span>
+        </div>
+        <div class="card__content">
+            <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="metric">
+                    <span class="metric__label">Situación</span>
+                    <span class="metric__value" id="finMainStatus" style="font-size: var(--text-sm); font-weight: var(--weight-semibold);">Cargando...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric__label">Gastos del mes</span>
+                    <span class="metric__value" id="finGastosMes" style="font-size: var(--text-2xl);">€ 0.00</span>
+                </div>
+            </div>
+        </div>
+        <div class="card__footer">
+            <a href="{{ url_for('dashboard.finanzas') }}" class="btn btn--primary btn--sm">
+                Ver detalles
+                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- SHOPPING LIST -->
+    <div class="card span-4">
+        <div class="card__header">
+            <h3 class="card__title">Lista Compra</h3>
+            <button class="btn btn--icon btn--ghost" id="addShoppingBtn" title="Añadir producto" aria-label="Añadir producto">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             </button>
         </div>
-        
-        <div class="card__content scrollable-y"> <!-- scrollable-y si esperas muchos docs -->
+        <div class="card__content">
+            <ul id="shoppingList" class="shopping-list"></ul>
+        </div>
+    </div>
+
+    <!-- ═══ ROW 4: Mealie + Menu Processor + Documents ═══ -->
+
+    <!-- MEALIE -->
+    <div class="card service-card span-4">
+        <div class="card__header">
+            <h3 class="card__title">Recetas</h3>
+            <span class="badge badge--success">
+                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Activo
+            </span>
+        </div>
+        <div class="service-card__content">
+            <div id="mealieStats" class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="metric metric--center">
+                    <span class="metric__value" id="mealieRecipesCount">--</span>
+                    <span class="metric__label">Recetas</span>
+                </div>
+                <div class="metric metric--center">
+                    <span class="metric__value" id="mealieMealsTodayCount">--</span>
+                    <span class="metric__label">Hoy</span>
+                </div>
+            </div>
+            <div class="mealie-meals-today">
+                <div class="mealie-meals-header">Plan de hoy</div>
+                <div class="mealie-meals-list" id="mealieMealsList">
+                    <div class="text-muted" style="font-size: var(--text-sm);">Sin datos aún...</div>
+                </div>
+            </div>
+        </div>
+        <div class="card__footer">
+            <a href="{{ services.mealie.url }}" target="_blank" class="btn btn--primary btn--sm">
+                Abrir Mealie
+                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- MENU PROCESSOR -->
+    <div class="card service-card span-4">
+        <div class="card__header">
+            <h3 class="card__title">Menús Semanales</h3>
+            <span class="badge badge--success" id="menuProcessorBadge">
+                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span id="menuProcessorBadgeText">Activo</span>
+            </span>
+        </div>
+        <div class="service-card__content">
+            <p class="service-card__description">
+                Procesa menús semanales y genera listas de compra en Mealie.
+            </p>
+            <div class="menu-processor-flow">
+                <div class="flow-step">
+                    <i class="bi bi-upload flow-step__icon"></i>
+                    <span class="flow-step__label">Cargar</span>
+                </div>
+                <div class="flow-step">
+                    <i class="bi bi-filetype-json flow-step__icon"></i>
+                    <span class="flow-step__label">Leer</span>
+                </div>
+                <div class="flow-step">
+                    <i class="bi bi-list-check flow-step__icon"></i>
+                    <span class="flow-step__label">Generar</span>
+                </div>
+                <div class="flow-step">
+                    <i class="bi bi-cart-plus flow-step__icon"></i>
+                    <span class="flow-step__label">Enviar</span>
+                </div>
+            </div>
+        </div>
+        <div class="card__footer">
+            <a href="{{ services.menu_processor.url }}" target="_blank" class="btn btn--primary btn--sm" id="menuProcessorButton" data-original-href="{{ services.menu_processor.url }}">
+                Abrir Procesador
+                <svg class="icon icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- DOCUMENTS -->
+    <div class="card span-4" id="documentsCard">
+        <div class="card__header">
+            <h3 class="card__title">Documentos</h3>
+            <button class="btn btn--icon btn--ghost btn--sm docs-toggle" onclick="dashboardInstance.toggleAllFolders()" aria-expanded="false" aria-label="Alternar vista">
+                <i class="bi bi-chevron-down"></i>
+            </button>
+        </div>
+        <div class="card__content scrollable-y">
             <div id="docsTree" class="docs-tree">
-                <!-- Se rellena dinámicamente desde JS -->
-                <span class="metric__value docs-loading">Cargando...</span>
+                <span class="text-muted">Cargando...</span>
             </div>
         </div>
     </div>
 
+</div>
 
 {% endblock %}

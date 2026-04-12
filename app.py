@@ -53,9 +53,9 @@ def create_app(config_name="default"):
         logging.getLogger("werkzeug").setLevel(logging.WARNING)
 
     # Registrar blueprints
-    from blueprints.main import main_bp
+    from blueprints import register_blueprints
 
-    app.register_blueprint(main_bp)
+    register_blueprints(app)
 
     # Contexto de plantillas global
     @app.context_processor
