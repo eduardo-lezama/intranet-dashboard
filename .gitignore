@@ -23,6 +23,9 @@ data/
 # Documentación interna con detalles de infraestructura
 INTERNAL_README.md
 
+# CV personal (se despliega via rsync, no pertenece al repo)
+static/cv/
+
 # Claves y certificados
 *.key
 *.pem
