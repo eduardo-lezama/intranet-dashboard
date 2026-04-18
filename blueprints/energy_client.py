@@ -40,27 +40,47 @@ class EnergyClient:
 
     def get_monthly_consumption(self):
         """
-        Obtiene consumo total del mes actual en kWh
+        Obtiene consumo total del mes actual en kWh (NAS + Workstation)
         """
         try:
-            # Entity ID del sensor de consumo mensual (ya calculado por HA)
-            entity_id = "sensor.endoll_ups_nas_router_energy_month"  # Consumo mensual calculado
+            # Entity IDs de ambos sensores de consumo mensual
+            entities = [
+                "sensor.endoll_ups_nas_router_energy_month",
+                "sensor.endoll_workstation_edu_energy_month",
+            ]
 
-            url = f"{self.base_url}/api/states/{entity_id}"
+            total_consumption = 0.0
+            last_updated = None
+            successful_reads = 0
 
-            response = requests.get(
-                url, headers=self.headers, timeout=self.timeout
-            )
-            response.raise_for_status()
+            for entity_id in entities:
+                try:
+                    url = f"{self.base_url}/api/states/{entity_id}"
+                    response = requests.get(url, headers=self.headers, timeout=self.timeout)
+                    response.raise_for_status()
 
-            data = response.json()
-            consumption = self._to_float_state(data.get("state"), entity_id)
+                    data = response.json()
+                    consumption = self._to_float_state(data.get("state"), entity_id)
+                    total_consumption += consumption
+                    successful_reads += 1
+
+                    # Guardar el último timestamp más reciente
+                    if last_updated is None:
+                        last_updated = data.get("last_updated")
+
+                except Exception as e:
+                    logger.warning(f"Error leyendo {entity_id}: {e}")
+                    # Continuar con el siguiente sensor
+
+            if successful_reads == 0:
+                raise ValueError("No se pudo leer ningún sensor de consumo mensual")
 
             return {
-                "consumption_kwh": round(consumption, 2),
+                "consumption_kwh": round(total_consumption, 2),
                 "period": "mes actual",
-                "last_updated": data.get("last_updated", datetime.now().isoformat()),
+                "last_updated": last_updated or datetime.now().isoformat(),
                 "unit": "kWh",
+                "devices_read": successful_reads,
             }
 
         except Exception as e:
@@ -69,29 +89,48 @@ class EnergyClient:
 
     def get_monthly_cost(self):
         """
-        Obtiene coste acumulado del mes actual en €
-        Usa el sensor nas_router_ups_coste_mes que ya calcula el coste mensual correctamente en HA
+        Obtiene coste acumulado del mes actual en € (NAS + Workstation)
+        Usa los sensores de coste mensual calculados por HA (template + utility_meter)
         """
         try:
-            # Entity ID del nuevo sensor de coste mensual (template + utility_meter)
-            entity_id = "sensor.nas_router_ups_coste_mes"  # Coste mensual calculado por HA
+            # Entity IDs de ambos sensores de coste mensual
+            entities = [
+                "sensor.nas_router_ups_coste_mes",
+                "sensor.workstation_edu_coste_mes",
+            ]
 
-            url = f"{self.base_url}/api/states/{entity_id}"
+            total_cost = 0.0
+            last_updated = None
+            successful_reads = 0
 
-            response = requests.get(
-                url, headers=self.headers, timeout=self.timeout
-            )
-            response.raise_for_status()
+            for entity_id in entities:
+                try:
+                    url = f"{self.base_url}/api/states/{entity_id}"
+                    response = requests.get(url, headers=self.headers, timeout=self.timeout)
+                    response.raise_for_status()
 
-            data = response.json()
-            cost = self._to_float_state(data.get("state"), entity_id)
+                    data = response.json()
+                    cost = self._to_float_state(data.get("state"), entity_id)
+                    total_cost += cost
+                    successful_reads += 1
 
-            # El sensor ya es el coste mensual correcto, sin necesidad de cálculos adicionales
+                    # Guardar el último timestamp más reciente
+                    if last_updated is None:
+                        last_updated = data.get("last_updated")
+
+                except Exception as e:
+                    logger.warning(f"Error leyendo {entity_id}: {e}")
+                    # Continuar con el siguiente sensor
+
+            if successful_reads == 0:
+                raise ValueError("No se pudo leer ningún sensor de coste mensual")
+
             return {
-                "cost_eur": round(cost, 2),
+                "cost_eur": round(total_cost, 2),
                 "period": "mes actual",
-                "last_updated": data.get("last_updated", datetime.now().isoformat()),
+                "last_updated": last_updated or datetime.now().isoformat(),
                 "unit": "€",
+                "devices_read": successful_reads,
             }
 
         except Exception as e:
@@ -100,25 +139,46 @@ class EnergyClient:
 
     def get_current_power(self):
         """
-        Obtiene consumo instantáneo actual en W
+        Obtiene consumo instantáneo actual en W (NAS + Workstation)
         """
         try:
-            entity_id = "sensor.endoll_ups_nas_router_power"  # Potencia actual
+            # Entity IDs de ambos sensores de potencia instantánea
+            entities = [
+                "sensor.endoll_ups_nas_router_power",
+                "sensor.endoll_workstation_edu_power",
+            ]
 
-            url = f"{self.base_url}/api/states/{entity_id}"
+            total_power = 0.0
+            last_updated = None
+            successful_reads = 0
 
-            response = requests.get(
-                url, headers=self.headers, timeout=self.timeout
-            )
-            response.raise_for_status()
+            for entity_id in entities:
+                try:
+                    url = f"{self.base_url}/api/states/{entity_id}"
+                    response = requests.get(url, headers=self.headers, timeout=self.timeout)
+                    response.raise_for_status()
 
-            data = response.json()
-            power = self._to_float_state(data.get("state"), entity_id)
+                    data = response.json()
+                    power = self._to_float_state(data.get("state"), entity_id)
+                    total_power += power
+                    successful_reads += 1
+
+                    # Guardar el último timestamp más reciente
+                    if last_updated is None:
+                        last_updated = data.get("last_updated")
+
+                except Exception as e:
+                    logger.warning(f"Error leyendo {entity_id}: {e}")
+                    # Continuar con el siguiente sensor
+
+            if successful_reads == 0:
+                raise ValueError("No se pudo leer ningún sensor de potencia")
 
             return {
-                "power_w": round(power, 2),
-                "last_updated": data.get("last_updated", datetime.now().isoformat()),
+                "power_w": round(total_power, 2),
+                "last_updated": last_updated or datetime.now().isoformat(),
                 "unit": "W",
+                "devices_read": successful_reads,
             }
 
         except Exception as e:
